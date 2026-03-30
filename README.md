@@ -2,7 +2,7 @@
 
 Ambiente Docker para práticas de redes com Mininet.
 
-Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md).
+Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md) e o [Erros comuns, reset e emergência](docs/ERROS_COMUNS_E_EMERGENCIA.md).
 
 ## Laboratórios
 

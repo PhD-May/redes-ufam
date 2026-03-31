@@ -22,5 +22,11 @@ RUN apt-get update && \
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+COPY scripts/ /opt/mininet-lab/scripts/
+RUN chmod +x /opt/mininet-lab/scripts/collect_metrics.py && \
+    ln -sf /opt/mininet-lab/scripts/collect_metrics.py /usr/local/bin/collect-metrics
+
+ENV MININET_LAB_ROOT=/opt/mininet-lab
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/bin/bash"]

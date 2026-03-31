@@ -4,6 +4,12 @@ Ambiente Docker para práticas de redes com Mininet.
 
 Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md) e o [Erros comuns, reset e emergência](docs/ERROS_COMUNS_E_EMERGENCIA.md).
 
+## Arquitetura
+
+Visão completa da arquitetura do projeto:
+
+- [docs/ARQUITETURA.md](docs/ARQUITETURA.md)
+
 ## Coleta de métricas (automatizada)
 
 A documentação da coleta de métricas está em:

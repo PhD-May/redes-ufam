@@ -142,10 +142,11 @@ def collect(
 
     use_tc = bool(link_kwargs)
     topo = _single_switch_topo(link_kwargs if use_tc else {})
+    # Run without external OpenFlow controller (same spirit as `mn` fallback).
     if use_tc:
-        net = Mininet(topo=topo, switch=OVSSwitch, link=TCLink)
+        net = Mininet(topo=topo, switch=OVSSwitch, link=TCLink, controller=None)
     else:
-        net = Mininet(topo=topo, switch=OVSSwitch)
+        net = Mininet(topo=topo, switch=OVSSwitch, controller=None)
 
     net.start()
     time.sleep(0.5)

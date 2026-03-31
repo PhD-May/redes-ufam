@@ -6,23 +6,9 @@ Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md) e o [Erro
 
 ## Coleta de métricas (automatizada)
 
-O script `scripts/collect_metrics.py` sobe uma topologia simples (`h1`–`s1`–`h2`), mede **ping**, **pingAll** e **iperf3** (JSON) e grava um arquivo em `metrics/runs/run_<timestamp>.json`.
+A documentação da coleta de métricas está em:
 
-**Dentro do container** (repositório montado ou cópia em `/opt/mininet-lab` na imagem):
-
-```bash
-python3 scripts/collect_metrics.py
-# ou, na imagem Docker:
-collect-metrics
-```
-
-**Com emulação de link** (ex.: Lab 3 — atraso e perda):
-
-```bash
-python3 scripts/collect_metrics.py --bw 10 --delay 30ms --loss 2
-```
-
-Detalhes do formato e como **persistir JSON no host** com `docker run -v`: veja [metrics/README.md](metrics/README.md).
+- [metrics/README.md](metrics/README.md)
 
 ## Laboratórios
 
@@ -108,11 +94,11 @@ exit
 2. No shell do container, limpe o estado do Mininet:
 
 ```bash
-sudo mn -c
+mn -c
 ```
 
-Se `sudo` não existir no container (execução como root), use:
+Se você estiver usando Mininet instalado diretamente no host Linux, use:
 
 ```bash
-mn -c
+sudo mn -c
 ```

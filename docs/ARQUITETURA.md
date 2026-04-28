@@ -52,6 +52,12 @@ flowchart LR
   coleta --> jsonOut
 ```
 
+Versão estática (PNG):
+
+![Diagrama de arquitetura](diagrama-arquitetura.png)
+
+O diagrama fonte está em [`diagrama-arquitetura.mmd`](diagrama-arquitetura.mmd).
+
 ## Fluxo de execução
 
 1. Build da imagem com `docker build -t mininet-lab .`.

@@ -1,0 +1,41 @@
+flowchart LR
+  usuario[AlunoProfessor]
+  repositorio[mininet-graduacao]
+  readme[README.md]
+  docs[docs/]
+  labs[labs/]
+  topologias[topologies/]
+  metricasDoc[metrics/README.md]
+
+  dockerfile[Dockerfile]
+  runsh[run.sh]
+  entrypoint[docker-entrypoint.sh]
+  coleta[scripts/collect_metrics.py]
+
+  dockerEngine[DockerEngine]
+  container[mininet-lab-container]
+  ovs[OpenvSwitch]
+  mininet[Mininet]
+  ferramentas[ferramentas-rede]
+  jsonOut[metrics/runs/run_timestamp.json]
+
+  usuario --> readme
+  readme --> docs
+  readme --> labs
+  readme --> topologias
+  readme --> metricasDoc
+
+  repositorio --> dockerfile
+  repositorio --> runsh
+  repositorio --> entrypoint
+  repositorio --> coleta
+
+  dockerfile --> dockerEngine
+  runsh --> dockerEngine
+  dockerEngine --> container
+  entrypoint --> ovs
+  container --> mininet
+  mininet --> ovs
+  mininet --> ferramentas
+  coleta --> mininet
+  coleta --> jsonOut

@@ -15,10 +15,6 @@ docker build -t mininet-lab .
 ./run.sh
 ```
 
-Explicação:
-- `docker build` cria o ambiente padronizado para todos os alunos.
-- `./run.sh` sobe o container com privilégios de rede para o Mininet.
-
 ## Sugestão de topologia
 
 - `h1 -- r1 -- r2 -- h2`
@@ -81,3 +77,20 @@ Conceito:
 | Roteamento habilitado | `sysctl net.ipv4.ip_forward` | Valor `1` em `r1` e `r2` |  |  |
 | Rotas estáticas | `ip route` | Rotas para redes remotas presentes |  |  |
 | Conectividade final | `ping` / `traceroute` | Comunicação fim-a-fim funcional |  |  |
+
+## Quando usar o coletor de métricas (roteamento)
+
+Fluxo recomendado:
+
+1. Execute o laboratório manualmente para entender cada comando.
+2. Ao final do cenário, rode o coletor de roteamento **uma vez** para gerar JSON estruturado.
+
+```bash
+collect-metrics-routing
+```
+
+Opcional (emular condições no enlace `r1<->r2`):
+
+```bash
+collect-metrics-routing --core-bw 10 --core-delay 20ms --core-loss 2
+```

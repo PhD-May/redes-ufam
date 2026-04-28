@@ -23,8 +23,9 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY scripts/ /opt/mininet-lab/scripts/
-RUN chmod +x /opt/mininet-lab/scripts/collect_metrics.py && \
-    ln -sf /opt/mininet-lab/scripts/collect_metrics.py /usr/local/bin/collect-metrics
+RUN chmod +x /opt/mininet-lab/scripts/collect_metrics.py /opt/mininet-lab/scripts/collect_metrics_routing.py && \
+    ln -sf /opt/mininet-lab/scripts/collect_metrics.py /usr/local/bin/collect-metrics && \
+    ln -sf /opt/mininet-lab/scripts/collect_metrics_routing.py /usr/local/bin/collect-metrics-routing
 
 ENV MININET_LAB_ROOT=/opt/mininet-lab
 

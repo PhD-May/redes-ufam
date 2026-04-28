@@ -42,7 +42,7 @@ Conceito:
    - `iperf h1 h2`
 3. Registre o resultado.
 
-## Atividade 2 - Baseline TCP (sem emulação de link)
+## Atividade 2 - Baseline TCP 
 
 Conceito:
 - Baseline é o cenário de referência sem atraso/perda artificiais.

@@ -111,3 +111,17 @@ iperf h1 h2
 | Rotas estáticas | `ip route` | Rotas para redes remotas presentes |  |  |
 | Ping ponta a ponta | `h1 ping -c 3 h2` | Resposta com perda baixa/zero |  |  |
 | Vazão ponta a ponta | `iperf h1 h2` | Throughput consistente com cenário |  |  |
+
+## Quando usar o coletor de métricas (roteamento)
+
+Após validar a topologia manualmente, gere um JSON para análise posterior:
+
+```bash
+collect-metrics-routing
+```
+
+Para testar impacto de atraso/perda no enlace entre roteadores:
+
+```bash
+collect-metrics-routing --core-bw 10 --core-delay 20ms --core-loss 2
+```

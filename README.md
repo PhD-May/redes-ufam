@@ -10,20 +10,6 @@ Visão completa da arquitetura do projeto:
 
 - [docs/ARQUITETURA.md](docs/ARQUITETURA.md)
 
-### Documentação em PDF (único arquivo)
-
-Para gerar um único PDF com o README e os documentos referenciados (guia rápido, erros, arquitetura, métricas e laboratórios), use Docker e o script:
-
-```bash
-./scripts/build-docs-pdf.sh
-```
-
-O arquivo sai em `docs/mininet-graduacao-documentacao.pdf` (é necessário Docker; em Mac com Apple Silicon a imagem Pandoc roda em modo `linux/amd64`). Para outro caminho:
-
-```bash
-./scripts/build-docs-pdf.sh /caminho/dentro/do/repo/saida.pdf
-```
-
 ## Coleta de métricas (automatizada)
 
 A documentação da coleta de métricas está em:
@@ -137,8 +123,14 @@ Exemplos úteis para a disciplina:
 - estrela (vários hosts em um switch central);
 - árvore (camadas de agregação/acesso);
 - roteada com múltiplas sub-redes (`h1 - r1 - r2 - h2`);
+- roteada com segmentos L2 explícitos (`h1 - s1 - r1 - r2 - s2 - h2`);
 - com emulação de link (`tc`) para atraso/perda/banda:
   - `delay`, `loss`, `bw`.
+
+Observação conceitual:
+- As duas topologias roteadas acima são válidas.
+- A versão sem switches (`h1-r1-r2-h2`) é mais enxuta para aprender roteamento.
+- A versão com switches (`h1-s1-r1-r2-s2-h2`) representa melhor redes reais com domínios de camada 2.
 
 ## Comandos básicos Mininet
 

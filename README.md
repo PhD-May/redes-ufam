@@ -4,7 +4,7 @@ Ambiente Docker para práticas de redes com Mininet.
 
 Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md) e o [Erros comuns, reset e emergência](docs/ERROS_COMUNS_E_EMERGENCIA.md).
 
-Material de aula (slides + roteiro do apresentador): [docs/aula/](docs/aula/).
+Material de aula (slides): [docs/aula/](docs/aula/).
 
 ## Arquitetura
 

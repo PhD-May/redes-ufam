@@ -94,4 +94,4 @@ Ordem de prioridade da pasta de saída:
 
 ## Material de aula
 
-Slides e roteiro do apresentador: [`docs/aula/`](aula/).
+Slides: [`docs/aula/`](aula/).

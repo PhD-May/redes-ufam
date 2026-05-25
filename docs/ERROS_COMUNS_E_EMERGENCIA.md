@@ -11,6 +11,8 @@ Guia rápido para quando algo “trava” ou o laboratório não sobe como esper
 | `mn` falha após fechar o terminal sem `exit` | Estado antigo de namespaces, interfaces ou bridges. | Rode `mn -c` (ou `sudo mn -c` no host Linux). |
 | `pingall` falha ou comportamento estranho | Topologia anterior ainda parcialmente ativa. | `exit` no CLI do Mininet, depois `mn -c` e tente de novo. |
 | Permissão negada ao usar Docker | Daemon do Docker não acessível ou usuário fora do grupo `docker`. | No Linux: `sudo usermod -aG docker $USER` e novo login; ou use `sudo docker ...`. |
+| `collect-metrics` não encontrado ou JSON não aparece no PC | Coletor rodado fora do container, sem volume, ou no prompt `mininet>`. | Use `./run.sh`; rode coletores no shell `root@...#` após `mn -c`; confira `metrics/runs/` no host. |
+| Gráficos vazios ou “sem dados” | CSV ausente ou só um algoritmo TCP nas coletas. | `python3 scripts/json_runs_to_csv.py`; para comparar `cubic` vs `reno`, duas coletas com `sysctl -w` entre elas. |
 
 ## Como resetar o Mininet
 

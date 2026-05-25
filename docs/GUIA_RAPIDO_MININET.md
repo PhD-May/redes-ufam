@@ -36,8 +36,18 @@ exit
 mn -c
 ```
 
+## Coletores (após `exit` e `mn -c`)
+
+```bash
+collect-metrics                    # Labs 1–2 → run_*.json
+collect-metrics-routing            # Lab 3 → routing_run_*.json
+```
+
+Não rode no prompt `mininet>`. Detalhes: `metrics/README.md`.
+
 ## Dicas rápidas
 
 - Se `pingall` falhar, rode `mn -c` e inicie novamente.
 - Em container com usuário `root`, não use `sudo`.
 - Para teste rápido sem entrar no CLI: `mn --test pingall`.
+- Subir o lab com `./run.sh` grava métricas em `metrics/runs/` no seu repositório.

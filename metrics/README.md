@@ -3,7 +3,7 @@
 Os arquivos JSON são gerados automaticamente pelos scripts:
 
 - `scripts/collect_metrics.py` (`collect-metrics`): topologia simples `h1-s1-h2` (Labs 1 e 2).
-- `scripts/collect_metrics_routing.py` (`collect-metrics-routing`): topologia roteada `h1-s1-r1-r2-s2-h2` (Labs 3 e 4).
+- `scripts/collect_metrics_routing.py` (`collect-metrics-routing`): topologia roteada `h1-r1-r2-h2` (Lab 3).
 
 ## Formato (`mininet-lab-metrics/v1`)
 
@@ -20,12 +20,13 @@ Cada execução produz um arquivo em `metrics/runs/` com nome `run_<timestamp>.j
 
 Cada execução produz um arquivo em `metrics/runs/` com nome `routing_run_<timestamp>.json`, contendo:
 
-- `topology`: topologia usada (`h1-s1-r1-r2-s2-h2`)
+- `topology`: sempre `h1-r1-r2-h2`
 - `core_link_emulation`: parâmetros no enlace entre roteadores (`core-bw`, `core-delay`, `core-loss`)
 - `ping`: métricas bidirecionais (`h1->h2` e `h2->h1`)
 - `pingall_loss_percent`: perda reportada por `pingAll()`
 - `iperf3`: throughput bidirecional (`h1->h2` e `h2->h1`)
 - `routes`: tabelas de rota de `r1` e `r2`
+- `sysctl_tcp`: algoritmo TCP ativo na coleta (mesmo formato dos Labs 1–2)
 
 ## Persistir resultados no host
 
@@ -60,5 +61,44 @@ docker run ... -e METRICS_OUTPUT_DIR=/workspace/metrics/runs mininet-lab collect
 Exemplo do coletor roteado com emulação no enlace `r1<->r2`:
 
 ```bash
+collect-metrics-routing
 collect-metrics-routing --core-bw 10 --core-delay 20ms --core-loss 2
 ```
+
+Sim, **é o coletor que gera o JSON** (não o comando `mn` interativo). O arquivo é escrito automaticamente em `metrics/runs/`.
+
+## Exportar para CSV (gráficos)
+
+Depois de rodar os coletores, agregue os JSON em CSV:
+
+```bash
+python3 scripts/json_runs_to_csv.py
+```
+
+Gera (na pasta `metrics/runs/`):
+
+- `labs_1_2_runs.csv` — a partir de `run_*.json` (Labs 1/2)
+- `lab3_runs.csv` — a partir de `routing_run_*.json` (Lab 3, arquivo separado)
+
+Opções:
+
+```bash
+python3 scripts/json_runs_to_csv.py --input-dir metrics/runs --output-dir metrics/runs
+python3 scripts/json_runs_to_csv.py --combined   # também cria all_runs.csv (resumo)
+```
+
+Os CSV podem ser abertos no Excel, LibreOffice, pandas ou ferramentas de plotagem.
+
+## Gráficos
+
+Com CSVs prontos, gere figuras em `metrics/plots/`:
+
+```bash
+./run.sh plots
+```
+
+`./run.sh plots` tenta converter JSON→CSV automaticamente se existir `run_*.json` e ainda não houver `labs_1_2_runs.csv`.
+
+Gráficos principais (Labs 1–2): comparação de throughput, RTT e perda por cenário e `tcp_congestion_control` (`cubic`, `reno`, …). Lab 3: throughput e RTT bidirecionais por cenário (e por `tcp_congestion_control` se houver coletas com algoritmos diferentes).
+
+Para comparar algoritmos TCP, rode coletas com `sysctl -w net.ipv4.tcp_congestion_control=reno` (ou `cubic`) antes de cada `collect-metrics`.

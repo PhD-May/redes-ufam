@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-"""Topologia para o Lab 4: 2 switches + 2 roteadores + 2 hosts.
+"""Topologia para o Lab 3: roteamento com links ponto a ponto (sem switches).
 
 Topologia:
-    h1 --- s1 --- r1 --- r2 --- s2 --- h2
+    h1 --- r1 --- r2 --- h2
+
+Cada enlace é um segmento L3; r1 e r2 atuam como roteadores Linux (ip_forward=1).
+Não é obrigatório usar switch entre roteadores — links diretos host-host são válidos no Mininet.
 """
 
 from mininet.cli import CLI
 from mininet.log import setLogLevel
 from mininet.net import Mininet
-from mininet.node import OVSSwitch
 
 
 def configure_nodes(h1, h2, r1, r2):
-    """Configura IPs iniciais e habilita roteamento em r1/r2."""
-    # Enderecamento:
-    # h1-eth0 <-> r1-eth0: 10.0.1.0/24
-    # r1-eth1 <-> r2-eth0: 10.0.12.0/24
-    # r2-eth1 <-> h2-eth0: 10.0.2.0/24
+    """Configura IPs e rotas estáticas do Lab 3."""
     h1.cmd("ip addr add 10.0.1.10/24 dev h1-eth0")
     h2.cmd("ip addr add 10.0.2.10/24 dev h2-eth0")
 
@@ -28,33 +26,24 @@ def configure_nodes(h1, h2, r1, r2):
     r1.cmd("sysctl -w net.ipv4.ip_forward=1")
     r2.cmd("sysctl -w net.ipv4.ip_forward=1")
 
-    # Rotas default dos hosts.
     h1.cmd("ip route add default via 10.0.1.1")
     h2.cmd("ip route add default via 10.0.2.1")
-
-    # Rotas entre roteadores para alcance fim-a-fim.
     r1.cmd("ip route add 10.0.2.0/24 via 10.0.12.2")
     r2.cmd("ip route add 10.0.1.0/24 via 10.0.12.1")
 
 
 def run():
-    net = Mininet(switch=OVSSwitch, build=False, autoSetMacs=True)
+    net = Mininet(controller=None)
 
     h1 = net.addHost("h1")
-    h2 = net.addHost("h2")
     r1 = net.addHost("r1")
     r2 = net.addHost("r2")
+    h2 = net.addHost("h2")
 
-    s1 = net.addSwitch("s1")
-    s2 = net.addSwitch("s2")
-
-    net.addLink(h1, s1)  # h1-eth0
-    net.addLink(s1, r1)  # r1-eth0
+    net.addLink(h1, r1)  # h1-eth0 <-> r1-eth0
     net.addLink(r1, r2)  # r1-eth1 <-> r2-eth0
-    net.addLink(r2, s2)  # r2-eth1
-    net.addLink(s2, h2)  # h2-eth0
+    net.addLink(r2, h2)  # r2-eth1 <-> h2-eth0
 
-    net.build()
     net.start()
 
     configure_nodes(h1, h2, r1, r2)

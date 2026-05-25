@@ -1,41 +1,65 @@
-flowchart LR
-  usuario[AlunoProfessor]
-  repositorio[mininet-graduacao]
-  readme[README.md]
-  docs[docs/]
-  labs[labs/]
-  topologias[topologies/]
-  metricasDoc[metrics/README.md]
+flowchart TB
+  subgraph doc [Documentação e roteiros]
+    usuario[Aluno / Professor]
+    readme[README.md]
+    labs[labs/ Lab 1–3]
+    docs[docs/ + docs/aula/]
+    topologias[topologies/]
+    metricasDoc[metrics/README.md]
+  end
 
-  dockerfile[Dockerfile]
-  runsh[run.sh]
-  entrypoint[docker-entrypoint.sh]
-  coleta[scripts/collect_metrics.py]
+  subgraph repo [Repositório redes-ufam]
+    runsh[run.sh]
+    dockerfile[Dockerfile]
+    dockerfilePlots[Dockerfile.plots]
+    entrypoint[docker-entrypoint.sh]
+    scripts[scripts/]
+    notebook[notebooks/gerar_graficos.ipynb]
+  end
 
-  dockerEngine[DockerEngine]
-  container[mininet-lab-container]
-  ovs[OpenvSwitch]
-  mininet[Mininet]
-  ferramentas[ferramentas-rede]
-  jsonOut[metrics/runs/run_timestamp.json]
+  subgraph docker [Docker Engine]
+    container[mininet-lab]
+    containerPlots[mininet-lab-plots]
+  end
+
+  subgraph runtime [Ambiente de laboratório]
+    ovs[Open vSwitch]
+    mininet[Mininet CLI / topologias]
+    coletaLab[collect-metrics\nLabs 1–2]
+    coletaRoute[collect-metrics-routing\nLab 3]
+  end
+
+  subgraph artifacts [Artefatos gerados]
+    jsonOut["metrics/runs/\nrun_*.json\nrouting_run_*.json"]
+    jsonCsv[json_runs_to_csv.py]
+    csvOut["metrics/runs/\nlabs_1_2_runs.csv\nlab3_runs.csv"]
+    pngOut["metrics/plots/\n*.png"]
+  end
 
   usuario --> readme
-  readme --> docs
   readme --> labs
+  readme --> docs
   readme --> topologias
   readme --> metricasDoc
 
-  repositorio --> dockerfile
-  repositorio --> runsh
-  repositorio --> entrypoint
-  repositorio --> coleta
-
-  dockerfile --> dockerEngine
-  runsh --> dockerEngine
-  dockerEngine --> container
+  runsh -->|lab| container
+  runsh -->|plots| containerPlots
+  dockerfile --> container
+  dockerfilePlots --> containerPlots
   entrypoint --> ovs
+  container --> ovs
   container --> mininet
-  mininet --> ovs
-  mininet --> ferramentas
-  coleta --> mininet
-  coleta --> jsonOut
+  scripts --> coletaLab
+  scripts --> coletaRoute
+  scripts --> jsonCsv
+
+  mininet --> coletaLab
+  mininet --> coletaRoute
+  coletaLab --> jsonOut
+  coletaRoute --> jsonOut
+
+  jsonOut --> jsonCsv
+  jsonCsv --> csvOut
+  csvOut --> notebook
+  notebook --> containerPlots
+  containerPlots --> pngOut

@@ -1,8 +1,11 @@
 # Métricas geradas automaticamente (mantém a pasta com .gitkeep)
 metrics/runs/*.json
+metrics/runs/*.csv
+metrics/plots/*.png
 
-# PDF e Markdown combinado gerados por scripts/build-docs-pdf.sh
-docs/mininet-graduacao-documentacao.pdf
-docs/DOCUMENTACAO_COMPLETA.md
+__pycache__/
+*.py[cod]
 
 .DS_Store
+
+docs/aula/

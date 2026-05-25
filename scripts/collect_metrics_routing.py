@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Coleta automatizada de métricas para topologia roteada (Labs 3 e 4).
+Coleta automatizada de métricas para topologia roteada (Lab 3).
 
-Topologia alvo:
-    h1 --- s1 --- r1 --- r2 --- s2 --- h2
+Topologia: h1 --- r1 --- r2 --- h2
 
 Uso:
   python3 scripts/collect_metrics_routing.py
-  python3 scripts/collect_metrics_routing.py --core-delay 20ms --core-loss 2 --core-bw 10
+  python3 scripts/collect_metrics_routing.py --core-delay 20ms
 
 Saída: metrics/runs/routing_run_<timestamp>.json
 """
@@ -25,7 +24,6 @@ from pathlib import Path
 from mininet.link import TCLink
 from mininet.log import setLogLevel
 from mininet.net import Mininet
-from mininet.node import OVSSwitch
 from mininet.topo import Topo
 
 
@@ -96,26 +94,35 @@ def _iperf3_json(src, dst, duration: int = 10) -> dict:
 
 
 class RoutingTopo(Topo):
+    """Lab 3: links ponto a ponto entre hosts e roteadores."""
+
     def __init__(self, core_link_kwargs: dict | None = None):
         self.core_link_kwargs = core_link_kwargs or {}
         super().__init__()
 
     def build(self):
-        s1 = self.addSwitch("s1")
-        s2 = self.addSwitch("s2")
         h1 = self.addHost("h1")
-        h2 = self.addHost("h2")
         r1 = self.addHost("r1")
         r2 = self.addHost("r2")
+        h2 = self.addHost("h2")
 
-        self.addLink(h1, s1)
-        self.addLink(s1, r1)  # r1-eth0
+        self.addLink(h1, r1)
         if self.core_link_kwargs:
-            self.addLink(r1, r2, **self.core_link_kwargs)  # r1-eth1 <-> r2-eth0
+            self.addLink(r1, r2, **self.core_link_kwargs)
         else:
             self.addLink(r1, r2)
-        self.addLink(r2, s2)  # r2-eth1
-        self.addLink(s2, h2)
+        self.addLink(r2, h2)
+
+
+def _sysctl_tcp() -> dict:
+    try:
+        with open("/proc/sys/net/ipv4/tcp_congestion_control") as f:
+            cc = f.read().strip()
+        with open("/proc/sys/net/ipv4/tcp_available_congestion_control") as f:
+            avail = f.read().strip().split()
+        return {"tcp_congestion_control": cc, "tcp_available": avail}
+    except OSError:
+        return {}
 
 
 def _configure_routing_nodes(net: Mininet) -> None:
@@ -136,7 +143,13 @@ def _configure_routing_nodes(net: Mininet) -> None:
     r2.cmd("ip route add 10.0.1.0/24 via 10.0.12.1")
 
 
-def collect(core_bw, core_delay, core_loss, ping_count: int, iperf_duration: int) -> dict:
+def collect(
+    core_bw,
+    core_delay,
+    core_loss,
+    ping_count: int,
+    iperf_duration: int,
+) -> dict:
     core_link_kwargs = {}
     if core_bw is not None:
         core_link_kwargs["bw"] = core_bw
@@ -146,7 +159,7 @@ def collect(core_bw, core_delay, core_loss, ping_count: int, iperf_duration: int
         core_link_kwargs["loss"] = core_loss
 
     topo = RoutingTopo(core_link_kwargs=core_link_kwargs)
-    net = Mininet(topo=topo, switch=OVSSwitch, link=TCLink, controller=None)
+    net = Mininet(topo=topo, link=TCLink, controller=None)
     net.start()
     time.sleep(0.5)
     _configure_routing_nodes(net)
@@ -163,7 +176,7 @@ def collect(core_bw, core_delay, core_loss, ping_count: int, iperf_duration: int
         return {
             "schema": "mininet-routing-metrics/v1",
             "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-            "topology": "h1-s1-r1-r2-s2-h2",
+            "topology": "h1-r1-r2-h2",
             "core_link_emulation": core_link_kwargs if core_link_kwargs else None,
             "ping": {
                 "h1_to_h2": {"ping_count": ping_count, **_parse_ping_rtt(ping_h1_h2_raw)},
@@ -172,13 +185,14 @@ def collect(core_bw, core_delay, core_loss, ping_count: int, iperf_duration: int
             "pingall_loss_percent": float(pingall_loss) if pingall_loss is not None else None,
             "iperf3": {"h1_to_h2": iperf_h1_h2, "h2_to_h1": iperf_h2_h1},
             "routes": {"r1": r1.cmd("ip route").strip(), "r2": r2.cmd("ip route").strip()},
+            "sysctl_tcp": _sysctl_tcp(),
         }
     finally:
         net.stop()
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Coleta métricas para topologia roteada")
+    parser = argparse.ArgumentParser(description="Coleta métricas para topologia roteada (Lab 3)")
     parser.add_argument("--core-bw", type=float, default=None, help="Mbps no link r1<->r2")
     parser.add_argument("--core-delay", type=str, default=None, help="ex.: 20ms no link r1<->r2")
     parser.add_argument("--core-loss", type=float, default=None, help="percentual no link r1<->r2")

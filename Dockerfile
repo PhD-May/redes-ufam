@@ -11,6 +11,7 @@ RUN apt-get update && \
       tcpdump \
       iproute2 \
       iputils-ping \
+      traceroute \
       python3 \
       python3-pip \
       net-tools \

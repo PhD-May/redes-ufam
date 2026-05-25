@@ -4,6 +4,8 @@ Ambiente Docker para práticas de redes com Mininet.
 
 Consulte também o [Guia Rápido Mininet](docs/GUIA_RAPIDO_MININET.md) e o [Erros comuns, reset e emergência](docs/ERROS_COMUNS_E_EMERGENCIA.md).
 
+Material de aula (slides + roteiro do apresentador): [docs/aula/](docs/aula/).
+
 ## Arquitetura
 
 Visão completa da arquitetura do projeto:
@@ -21,11 +23,45 @@ A documentação da coleta de métricas está em:
 - [Lab 1 - TCP no Mininet](labs/lab1_tcp.md)
 - [Lab 2 - Controle de Congestionamento](labs/lab2_congestionamento.md)
 - [Lab 3 - Routing básico no Mininet](labs/lab3_routing.md)
-- [Lab 4 - Roteamento (opcional)](labs/lab4_routing_opcional.md)
 
-Topologia pronta para o Lab 4:
+Topologias prontas:
 
-- `topologies/topo_lab4_2switches.py`
+- `topologies/topo_simples.py`, `topologies/topo_estrela.py` (Labs 1 e 2)
+- `topologies/topo_lab3_routing.py` (Lab 3)
+
+## Coletores de métricas (referência rápida)
+
+Dentro do container, após sair do Mininet (`exit`) e limpar (`mn -c`):
+
+```bash
+# Labs 1 e 2 (topologia h1-s1-h2)
+collect-metrics
+collect-metrics --bw 10 --delay 30ms --loss 2
+
+# Lab 3 (topologia h1-r1-r2-h2)
+collect-metrics-routing
+collect-metrics-routing --core-bw 10 --core-delay 20ms --core-loss 2
+```
+
+Detalhes dos JSON gerados: [metrics/README.md](metrics/README.md).
+
+Para gráficos, agregue os JSON em CSV (no host ou no container):
+
+```bash
+python3 scripts/json_runs_to_csv.py
+# -> metrics/runs/labs_1_2_runs.csv e metrics/runs/lab3_runs.csv
+```
+
+### Gráficos (Docker separado)
+
+Imagem `mininet-lab-plots` (Jupyter + pandas + matplotlib). Gera PNGs em `metrics/plots/`:
+
+```bash
+./run.sh plots        # executa o notebook e salva os gráficos
+./run.sh plots-lab    # Jupyter Lab em http://localhost:8888
+```
+
+Comandos Mininet continuam com `./run.sh` ou `./run.sh lab`.
 
 ## Pré-requisitos
 
@@ -61,9 +97,19 @@ docker build -t mininet-lab .
 
 ```bash
 ./run.sh
+# equivalente: ./run.sh lab
 ```
 
-`run.sh` executa:
+Comandos do `run.sh`:
+
+| Comando | Descrição |
+|---------|-----------|
+| `./run.sh` / `lab` | Container Mininet interativo |
+| `./run.sh plots` | Gera PNG em `metrics/plots/` (imagem `mininet-lab-plots`) |
+| `./run.sh plots-lab` | Jupyter Lab em http://localhost:8888 |
+| `./run.sh help` | Ajuda |
+
+`run.sh` (modo lab) executa:
 
 ```bash
 docker run -it --rm --privileged --network host \
@@ -79,7 +125,7 @@ Com isso, arquivos gerados em `metrics/runs/` dentro do container também aparec
 As topologias dos laboratórios vêm de scripts Python na pasta `topologies/`.
 Você pode:
 
-- usar as topologias prontas (`topo_simples.py`, `topo_estrela.py`, `topo_lab4_2switches.py`);
+- usar as topologias prontas (`topo_simples.py`, `topo_estrela.py`, `topo_lab3_routing.py`);
 - criar novas topologias para atividades da disciplina.
 
 ### Como criar uma nova topologia
@@ -123,14 +169,8 @@ Exemplos úteis para a disciplina:
 - estrela (vários hosts em um switch central);
 - árvore (camadas de agregação/acesso);
 - roteada com múltiplas sub-redes (`h1 - r1 - r2 - h2`);
-- roteada com segmentos L2 explícitos (`h1 - s1 - r1 - r2 - s2 - h2`);
 - com emulação de link (`tc`) para atraso/perda/banda:
   - `delay`, `loss`, `bw`.
-
-Observação conceitual:
-- As duas topologias roteadas acima são válidas.
-- A versão sem switches (`h1-r1-r2-h2`) é mais enxuta para aprender roteamento.
-- A versão com switches (`h1-s1-r1-r2-s2-h2`) representa melhor redes reais com domínios de camada 2.
 
 ## Comandos básicos Mininet
 

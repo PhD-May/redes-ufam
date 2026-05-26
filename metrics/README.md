@@ -97,7 +97,7 @@ Com CSVs prontos, gere figuras em `metrics/plots/`:
 ./run.sh plots
 ```
 
-`./run.sh plots` tenta converter JSON→CSV automaticamente se existir `run_*.json` e ainda não houver `labs_1_2_runs.csv`.
+`./run.sh plots` reconverte JSON→CSV automaticamente antes de gerar os gráficos (sempre que existir `run_*.json` ou `routing_run_*.json`).
 
 Gráficos principais (Labs 1–2): comparação de throughput, RTT e perda por cenário e `tcp_congestion_control` (`cubic`, `reno`, …). Lab 3: throughput e RTT bidirecionais por cenário (e por `tcp_congestion_control` se houver coletas com algoritmos diferentes).
 

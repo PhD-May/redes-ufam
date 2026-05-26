@@ -37,8 +37,12 @@ build_plots_image() {
 }
 
 ensure_csv() {
-  if [[ ! -f "${ROOT_DIR}/metrics/runs/labs_1_2_runs.csv" ]] \
-    && compgen -G "${ROOT_DIR}/metrics/runs/run_"*.json >/dev/null 2>&1; then
+  local has_lab_json=false
+  local has_routing_json=false
+  compgen -G "${ROOT_DIR}/metrics/runs/run_"*.json >/dev/null 2>&1 && has_lab_json=true
+  compgen -G "${ROOT_DIR}/metrics/runs/routing_run_"*.json >/dev/null 2>&1 && has_routing_json=true
+
+  if [[ "${has_lab_json}" == true || "${has_routing_json}" == true ]]; then
     echo "Convertendo JSON -> CSV..."
     docker run --rm \
       -v "${ROOT_DIR}:/workspace" \

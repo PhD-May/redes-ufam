@@ -61,11 +61,21 @@ def _parse_ping_rtt(ping_output: str) -> dict:
     return out
 
 
-def _iperf3_json(src, dst, duration: int = 10) -> dict:
+#
+# Observação sobre IPs em Lab 3:
+# depois de `ip addr add ...` nos nós, o método Node.IP() do Mininet pode
+# continuar retornando o IP padrão original alocado pelo Mininet.
+# Para evitar métricas erradas, usamos explicitamente os IPs configurados.
+#
+H1_IP = "10.0.1.10"
+H2_IP = "10.0.2.10"
+
+
+def _iperf3_json(src, dst, src_ip: str, duration: int = 10) -> dict:
     src.cmd("killall -q iperf3 2>/dev/null || true")
     src.cmd("iperf3 -s -D")
     time.sleep(1.0)
-    raw = dst.cmd(f"iperf3 -c {src.IP()} -t {duration} -J -4 2>/dev/null")
+    raw = dst.cmd(f"iperf3 -c {src_ip} -t {duration} -J -4 2>/dev/null")
     src.cmd("killall -q iperf3 2>/dev/null || true")
     start = raw.find("{")
     if start < 0:
@@ -125,8 +135,22 @@ def _sysctl_tcp() -> dict:
         return {}
 
 
+def _flush_mininet_default_addrs(net: Mininet) -> None:
+    """Remove IPs /8 do Mininet (10.0.0.0/8) que quebram roteamento entre sub-redes."""
+    for host, intfs in (
+        (net["h1"], ("h1-eth0",)),
+        (net["h2"], ("h2-eth0",)),
+        (net["r1"], ("r1-eth0", "r1-eth1")),
+        (net["r2"], ("r2-eth0", "r2-eth1")),
+    ):
+        for intf in intfs:
+            host.cmd(f"ip addr flush dev {intf}")
+
+
 def _configure_routing_nodes(net: Mininet) -> None:
     h1, h2, r1, r2 = net["h1"], net["h2"], net["r1"], net["r2"]
+
+    _flush_mininet_default_addrs(net)
 
     h1.cmd("ip addr add 10.0.1.10/24 dev h1-eth0")
     h2.cmd("ip addr add 10.0.2.10/24 dev h2-eth0")
@@ -159,6 +183,7 @@ def collect(
         core_link_kwargs["loss"] = core_loss
 
     topo = RoutingTopo(core_link_kwargs=core_link_kwargs)
+    # Topologia ponto a ponto (sem switches), como topologies/topo_lab3_routing.py
     net = Mininet(topo=topo, link=TCLink, controller=None)
     net.start()
     time.sleep(0.5)
@@ -167,11 +192,11 @@ def collect(
 
     h1, h2, r1, r2 = net["h1"], net["h2"], net["r1"], net["r2"]
     try:
-        ping_h1_h2_raw = h1.cmd(f"ping -c {ping_count} -q {h2.IP()}")
-        ping_h2_h1_raw = h2.cmd(f"ping -c {ping_count} -q {h1.IP()}")
+        ping_h1_h2_raw = h1.cmd(f"ping -c {ping_count} -q {H2_IP}")
+        ping_h2_h1_raw = h2.cmd(f"ping -c {ping_count} -q {H1_IP}")
         pingall_loss = net.pingAll()
-        iperf_h1_h2 = _iperf3_json(h1, h2, duration=iperf_duration)
-        iperf_h2_h1 = _iperf3_json(h2, h1, duration=iperf_duration)
+        iperf_h1_h2 = _iperf3_json(h1, h2, src_ip=H1_IP, duration=iperf_duration)
+        iperf_h2_h1 = _iperf3_json(h2, h1, src_ip=H2_IP, duration=iperf_duration)
 
         return {
             "schema": "mininet-routing-metrics/v1",

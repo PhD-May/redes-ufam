@@ -23,7 +23,7 @@ from pathlib import Path
 from mininet.link import TCLink
 from mininet.log import setLogLevel
 from mininet.net import Mininet
-from mininet.node import OVSSwitch
+from mininet.node import OVSBridge
 from mininet.topo import Topo
 
 
@@ -142,11 +142,11 @@ def collect(
 
     use_tc = bool(link_kwargs)
     topo = _single_switch_topo(link_kwargs if use_tc else {})
-    # Run without external OpenFlow controller (same spirit as `mn` fallback).
+    # OVSBridge = fail_mode standalone (same as `mn` "Falling back to OVS Bridge").
     if use_tc:
-        net = Mininet(topo=topo, switch=OVSSwitch, link=TCLink, controller=None)
+        net = Mininet(topo=topo, switch=OVSBridge, link=TCLink, controller=None)
     else:
-        net = Mininet(topo=topo, switch=OVSSwitch, controller=None)
+        net = Mininet(topo=topo, switch=OVSBridge, controller=None)
 
     net.start()
     time.sleep(0.5)

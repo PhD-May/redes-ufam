@@ -13,8 +13,22 @@ from mininet.log import setLogLevel
 from mininet.net import Mininet
 
 
+def _flush_mininet_default_addrs(h1, h2, r1, r2):
+    """Remove IPs /8 do Mininet que fazem 10.0.2.x parecer diretamente alcançável."""
+    for host, intfs in (
+        (h1, ("h1-eth0",)),
+        (h2, ("h2-eth0",)),
+        (r1, ("r1-eth0", "r1-eth1")),
+        (r2, ("r2-eth0", "r2-eth1")),
+    ):
+        for intf in intfs:
+            host.cmd(f"ip addr flush dev {intf}")
+
+
 def configure_nodes(h1, h2, r1, r2):
     """Configura IPs e rotas estáticas do Lab 3."""
+    _flush_mininet_default_addrs(h1, h2, r1, r2)
+
     h1.cmd("ip addr add 10.0.1.10/24 dev h1-eth0")
     h2.cmd("ip addr add 10.0.2.10/24 dev h2-eth0")
 
